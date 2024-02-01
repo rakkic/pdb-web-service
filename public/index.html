@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html data-theme="light">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>ProtWeb</title>
+        <link href="/style.css" rel="stylesheet" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500&display=swap"
+            rel="stylesheet"
+        />
+    </head>
+    <body>
+        <nav>
+            <a href="/home" class="logo">ProtWeb</a>
+            <div class="links">
+                <a href="/home">Home</a>
+                <a href="/queue">Queue</a>
+                <a href="/help">Help</a>
+                <a href="/about">About Us</a>
+            </div>
+        </nav>
+        <header>
+            <div class="left">
+                <h1>Let's Analyze <span>Proteins</span></h1>
+                <h3><span>Advanced Protein Analysis Simplified.</span></h3>
+            </div>
+            <img src="/assets/image-removebg-preview.png" />
+        </header>
+        <main class="container">
+            <div class="panel">
+                <form
+                    action="/upload"
+                    method="post"
+                    enctype="multipart/form-data"
+                    class="space-y-4"
+                >
+                    <div>
+                        <label for="jobName" class="text-gray-700">Job Name </label>
+                        <input
+                            type="text"
+                            placeholder="Letters, numbers or underline"
+                            class="input"
+                        />
+                    </div>
+                    <div>
+                        <label for="email" class="text-gray-700">Email</label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="Your email address"
+                            class="input"
+                        />
+                    </div>
+                    <div>
+                        <label for="pdbFile" class="text-gray-700">Input PDB File</label>
+                        <input
+                            type="file"
+                            id="pdbFile"
+                            name="pdbFile"
+                            accept=".pdb"
+                            onclick="Calc()"
+                            class="file-input"
+                        />
+                    </div>
+                    <div>
+                        <button class="submit">
+                            <span class="text">Submit</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </body>
+</html>

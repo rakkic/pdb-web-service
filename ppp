@@ -1,0 +1,49 @@
+        <main class="container mx-auto px-6 py-8">
+            <div class="bg-white shadow p-6 rounded-lg">
+                <h1 class="text-2xl font-bold text-gray-800 mb-2">PDB WEB Service</h1>
+                <p class="text-gray-600 mb-6">
+                    A web server for the structural prediction and analysis of protein-protein
+                    complex.
+                </p>
+                <form
+                    action="/upload"
+                    method="post"
+                    enctype="multipart/form-data"
+                    class="space-y-4"
+                >
+                    <div>
+                        <label for="jobName" class="text-gray-700">Job Name </label>
+                        <input
+                            type="text"
+                            placeholder="Letters, numbers or underline"
+                            class="input input-bordered w-full max-w-xs"
+                        />
+                    </div>
+                    <div>
+                        <label for="email" class="text-gray-700">Email</label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="Your email address"
+                            class="input input-bordered w-full max-w-xs"
+                        />
+                    </div>
+                    <div>
+                        <label for="pdbFile" class="text-gray-700">Input PDB File</label>
+                        <input
+                            type="file"
+                            id="pdbFile"
+                            name="pdbFile"
+                            accept=".pdb"
+                            class="file-input file-input-bordered file-input-primary w-full max-w-xs"
+                        />
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg">
+                            Submit
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>

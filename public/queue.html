@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html data-theme="light" lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Job Queue Status</title>
+        <link href="/style.css" rel="stylesheet" />
+    </head>
+    <body class="bg-gray-100">
+        <div class="container mx-auto px-4 py-8">
+            <h1 class="text-2xl font-bold text-gray-800 mb-4">Job Queue Status</h1>
+            <div class="overflow-x-auto bg-white rounded-lg shadow">
+                <table class="w-full whitespace-no-wrap">
+                    <thead>
+                        <tr class="text-left font-bold">
+                            <th class="px-6 py-3">Job ID</th>
+                            <th class="px-6 py-3">Job Name</th>
+                            <th class="px-6 py-3">Status</th>
+                            <th class="px-6 py-3">Start Time</th>
+                            <th class="px-6 py-3">End Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="jobs-table-body">
+                        <!-- Job rows will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <script>
+            function fetchJobs() {
+                fetch("/api/jobs")
+                    .then((response) => response.json())
+                    .then((jobs) => {
+                        const tableBody = document.getElementById("jobs-table-body");
+                        tableBody.innerHTML = ""; // Clear existing rows
+                        jobs.forEach((job) => {
+                            const statusColor =
+                                job.status === "RUNNING" ? "text-red-500" : "text-green-500";
+                            const row = `
+                            <tr>
+                                <td class="px-6 py-4">${job.jobId}</td>
+                                <td class="px-6 py-4">${job.jobName}</td>
+                                <td class="px-6 py-4 ${statusColor}">${job.status}</td>
+                                <td class="px-6 py-4">${job.startTime}</td>
+                                <td class="px-6 py-4">${job.endTime || "Processing"}</td>
+                            </tr>
+                        `;
+                            tableBody.innerHTML += row;
+                        });
+                    })
+                    .catch((error) => console.error("Error fetching jobs:", error));
+            }
+
+            window.addEventListener("DOMContentLoaded", (event) => {
+                fetchJobs();
+            });
+        </script>
+    </body>
+</html>
