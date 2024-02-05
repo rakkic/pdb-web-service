@@ -29,8 +29,8 @@
 
 rm(list=ls())
 #
-pdbfile<-'6dnl.pdb' # input
-outputfile<-'6dnl_CRYST.pdb' #output
+pdbfile<-'filename.pdb' # input
+outputfile<-'filename_CRYST.pdb' #output
 
 #pdb<-read.pdb(pdbfile)
 invisible(capture.output(pdb<-read.pdb(pdbfile))) # invisible - no messages 
