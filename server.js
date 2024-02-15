@@ -117,9 +117,24 @@ app.post('/upload2', uploadVerifyMiddleware,(req, res) => {
   
   const { jobName, email } = req.body;
   const pdbFile = req.file;
-  console.log('came here', jobName, email, pdbFile);
+  console.log('jobname', jobName, 'email', email, 'pdbfile', pdbFile);
+
+  exec(`Rscript add_symm_residues.r ${pdbFile.path} ${pdbFile.path}_processed.log`, (error, stdout, stderr) => {
+
+    if (error) {
+      console.error('Error executing R script:', error);
+      return res.status(500).send('Error processing PDB file.');
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'File uploaded successfully',
+      // stdout: stdout,
+      file: path.join(__dirname, '/uploads', pdbFile.filename)
+    })
+
+  })
   
-  return res.send('File uploaded successfully');
 
 })
 

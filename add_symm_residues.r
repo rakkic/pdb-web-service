@@ -26,10 +26,28 @@
 
 # INPUT: 6dnl.pdb
 # OUTPUT: 6dnl_CRYST.pdb
-
+library(bio3d)
 rm(list=ls())
+
+args <- commandArgs(trailingOnly = TRUE)
+
+# Check if two arguments are provided
+if(length(args) != 2) {
+  stop("Two numeric arguments are required", call. = FALSE)
+}
+
+# Convert arguments to numeric
+pdbfile <- args[1]
+outputfile <- args[2]
+
+# Concatenate the strings
+cat("src file:", pdbfile, "\noutput file:", outputfile, "\n")
+
+# exit from here
+q()
+
 #
-pdbfile<-'filename.pdb' # input
+pdbfile<-inputPdbFile # input
 outputfile<-'filename_CRYST.pdb' #output
 
 #pdb<-read.pdb(pdbfile)
