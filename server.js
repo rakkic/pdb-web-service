@@ -8,12 +8,43 @@ const fs = require("fs");
 const { exec } = require("child_process");
 
 const app = express();
-const upload = multer({ dest: "uploads/" });
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+// Configure static file serving
 app.use(express.static("public"));
 // Set the view engine to ejs
 app.set("view engine", "ejs");
 // In-memory storage for job data
+
+const upload = multer({ dest: "uploads/" });
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/'); // Ensure this directory exists
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + '-' + Date.now());
+  },
+});
+
+// const uploadMiddleware = upload.single("pdbFile", fileFilter);
+// const uploadMiddleware = multer({ storage: storage }).single('pdbFile');
+const uploadMiddleware = multer({ dest: 'uploads/' }).single('pdbFile');
+
+// Nodemailer transporter
+const transporter = nodemailer.createTransport({
+  service: "pop3", // CHECK POP3 IMAP FAMNIT SETTINGS
+  // ASK IT SRVICE; webmail.famnit.upr.si
+
+  // creds for configuration - CHECK POP3 IMAP FAMNIT SETTINGS
+  auth: {
+    user: process.env.EMAIL_USER, // Promeni tamo podatke!!!
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
 
 // IZBRISI POSLE
 // Dummy jobs data for demonstration
@@ -34,8 +65,7 @@ let jobs = {
   },
 };
 
-// Configure static file serving
-app.use(express.static("public"));
+
 
 // mailchimp !!!
 // post req
@@ -51,19 +81,47 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const uploadMiddleware = upload.single("pdbFile", fileFilter);
+const uploadVerifyMiddleware = (req, res, next) => {
+  uploadMiddleware(req, res, function(err) {
+    if (err instanceof multer.MulterError) {
+      // A Multer error occurred when uploading.
+      if (err.code === 'LIMIT_UNEXPECTED_FILE') {
+        return res.status(400).json({
+          success: false,
+          error: 'File upload error, Please upload a single file'
+        })
+      }
+  
+    } else if (err) {
+      // An unknown error occurred when uploading.
+      return res.status(500).json({
+        success: false,
+        error: 'File upload error, Please check the form parameters and try again.'
+      })
+    }
+  
+    // Everything went fine.
+    // res.send('File uploaded successfully');
+    // next()
+    // console.log("came here s", jobName, email, pdbFile);
+    // return res.status(200).json({
+    //   success: true,
+    //   message: 'File uploaded successfully',
+    //   file: path.join(__dirname, '/uploads', pdbFile.filename)
+    // })
+    next()
+  })
+}
 
-// Nodemailer transporter
-const transporter = nodemailer.createTransport({
-  service: "pop3", // CHECK POP3 IMAP FAMNIT SETTINGS
-  // ASK IT SRVICE; webmail.famnit.upr.si
+app.post('/upload2', uploadVerifyMiddleware,(req, res) => {
+  
+  const { jobName, email } = req.body;
+  const pdbFile = req.file;
+  console.log('came here', jobName, email, pdbFile);
+  
+  return res.send('File uploaded successfully');
 
-  // creds for configuration - CHECK POP3 IMAP FAMNIT SETTINGS
-  auth: {
-    user: process.env.EMAIL_USER, // Promeni tamo podatke!!!
-    pass: process.env.EMAIL_PASS,
-  },
-});
+})
 
 // POST route for file upload
 app.post("/upload", uploadMiddleware, (req, res) => {
@@ -78,19 +136,20 @@ app.post("/upload", uploadMiddleware, (req, res) => {
 
   const jobId = Date.now(); // Use a timestamp as a simple job ID
   const startTime = new Date();
-  fs.writeFileSync(pdbFile, "./uploads/newfile.pdb");
 
-  // Store job data
-  jobs[jobId] = {
-    jobName: jobName || `Job-${jobId}`,
-    email,
-    status: "RUNNING",
-    startTime,
-    endTime: null,
-  };
-
-  // Define the output file path
+  const newFilePath = path.join(__dirname, "uploads", pdbFile.filename);
   const outputFilePath = path.join(__dirname, "uploads", `${jobId}_result.txt`);
+    // Store job data
+    jobs[jobId] = {
+      jobName: jobName || `Job-${jobId}`,
+      email,
+      status: "RUNNING",
+      startTime,
+      endTime: null,
+      filePath: newFilePath,
+    };
+  // Define the output file path
+  // const outputFilePath = path.join(__dirname, "uploads", `${jobId}_result.txt`);
 
   // Execute the R script with the uploaded file path and the output file path as arguments
   exec(
